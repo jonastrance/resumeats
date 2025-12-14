@@ -1,8 +1,15 @@
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+let openaiInstance: OpenAI | null = null
+
+function getOpenAI(): OpenAI {
+  if (!openaiInstance) {
+    openaiInstance = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  }
+  return openaiInstance
+}
 
 export async function optimizeResume(
   resumeText: string,
@@ -39,6 +46,7 @@ ${resumeText}
 
 Return ONLY the optimized resume text, ready to copy. Include an ATS Score estimate (0-100) at the top.`
 
+  const openai = getOpenAI()
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
