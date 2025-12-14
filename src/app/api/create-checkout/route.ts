@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe, PRICE_AMOUNT, PRICE_CURRENCY } from '@/lib/stripe'
+import { getStripe, PRICE_AMOUNT, PRICE_CURRENCY } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-)
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  )
+}
 
 export async function POST(request: NextRequest) {
+  const supabaseAdmin = getSupabaseAdmin()
+  const stripe = getStripe()
   try {
     const formData = await request.formData()
     const email = formData.get('email') as string
