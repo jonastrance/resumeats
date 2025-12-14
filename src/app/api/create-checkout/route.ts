@@ -10,9 +10,32 @@ function getSupabaseAdmin() {
 }
 
 export async function POST(request: NextRequest) {
-  const supabaseAdmin = getSupabaseAdmin()
-  const stripe = getStripe()
   try {
+    // Validate environment variables
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+      console.error('Missing Supabase environment variables')
+      return NextResponse.json(
+        { error: 'Server configuration error: Missing database credentials' },
+        { status: 500 }
+      )
+    }
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('Missing Stripe environment variable')
+      return NextResponse.json(
+        { error: 'Server configuration error: Missing payment credentials' },
+        { status: 500 }
+      )
+    }
+    if (!process.env.NEXT_PUBLIC_URL) {
+      console.error('Missing NEXT_PUBLIC_URL environment variable')
+      return NextResponse.json(
+        { error: 'Server configuration error: Missing app URL' },
+        { status: 500 }
+      )
+    }
+
+    const supabaseAdmin = getSupabaseAdmin()
+    const stripe = getStripe()
     const formData = await request.formData()
     const email = formData.get('email') as string
     const resumeText = formData.get('resumeText') as string
